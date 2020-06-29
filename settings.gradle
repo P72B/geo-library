@@ -1,0 +1,3 @@
+include ':geo'
+include ':app'
+rootProject.name = "geo-library"
