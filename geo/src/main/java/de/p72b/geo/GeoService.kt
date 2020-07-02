@@ -8,7 +8,7 @@ import de.p72b.geo.google.DirectionsRoute
 import de.p72b.geo.google.ResolvedDirections
 import de.p72b.geo.http.ChannelIdInterceptor
 import de.p72b.geo.http.LatLngBoundsDeserializer
-import io.reactivex.Flowable
+import io.reactivex.Single
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -77,18 +77,18 @@ class GeoService(
     }
 
 
-    fun pedestrianRoute(origin: LatLng, destination: LatLng): Flowable<DirectionsRoute> {
+    fun pedestrianRoute(origin: LatLng, destination: LatLng): Single<DirectionsRoute> {
         return routeBy(origin, destination, "walking")
     }
 
-    fun drivingRoute(origin: LatLng, destination: LatLng): Flowable<DirectionsRoute> {
+    fun drivingRoute(origin: LatLng, destination: LatLng): Single<DirectionsRoute> {
         return routeBy(origin, destination, "driving")
     }
 
-    private fun routeBy(origin: LatLng, destination: LatLng, mode: String): Flowable<DirectionsRoute> {
+    private fun routeBy(origin: LatLng, destination: LatLng, mode: String): Single<DirectionsRoute> {
         val cached = directionsCache.get(origin, destination, mode)
         return if (cached != null) {
-            Flowable.just(cached)
+            Single.just(cached)
         } else distanceCall(origin, destination, mode)
             .map { response ->
                 var result = DirectionsRoute()
@@ -107,7 +107,7 @@ class GeoService(
         origin: LatLng,
         destination: LatLng,
         mode: String
-    ): Flowable<ResolvedDirections> {
+    ): Single<ResolvedDirections> {
         return api.distance(
             getLatLngApiRepresentation(origin.latitude, origin.longitude),
             getLatLngApiRepresentation(destination.latitude, destination.longitude),

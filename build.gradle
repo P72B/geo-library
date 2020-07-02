@@ -5,7 +5,10 @@ buildscript {
     ext {
         gson = "2.8.5"
         retrofit = "2.6.1"
+        rxandroidVersion = '2.1.1'
+        rxkotlinVersion = "2.3.0"
         playServicesMaps = "17.0.0"
+        koinVersion = "2.1.6"
     }
 
     repositories {
