@@ -12,9 +12,9 @@ import retrofit2.http.Query
 interface GeoServiceApi {
 
     companion object {
-        const val ENDPOINT_GEO_DIRECTIONS = "/directions/json"
-        const val ENDPOINT_GEO_GEOCODE = "/geocode/json"
-        const val ENDPOINT_GEO_AUTOCOMPLETE = "/autocomplete"
+        const val ENDPOINT_GEO_DIRECTIONS = "directions/json"
+        const val ENDPOINT_GEO_GEOCODE = "geocode/json"
+        const val ENDPOINT_GEO_AUTOCOMPLETE = "autocomplete"
         const val COMPONENT_PREFIX_COUNTRY = "country:"
     }
 

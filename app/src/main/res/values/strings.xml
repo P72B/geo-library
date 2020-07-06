@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">geo-library</string>
+    <string name="appName">geo-library</string>
+    <string name="origin">Origin</string>
+    <string name="destination">Destination</string>
+    <string name="transportationModeWalking">Walking</string>
+    <string name="transportationModeDriving">Driving</string>
 </resources>

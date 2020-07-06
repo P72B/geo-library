@@ -4,7 +4,9 @@ import de.p72b.geo.GeoService
 import de.p72b.geo.demo.showcase.MainViewModel
 import de.p72b.geo.demo.usecase.DrivingDirectionsUseCase
 import de.p72b.geo.demo.usecase.WalkingDirectionsUseCase
+import de.p72b.geo.util.SecuredConstants
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -17,7 +19,8 @@ object DependencyGraph {
         single {
             GeoService(
                 baseUrl = GEO_SERVICE_BASE_URL,
-                channelId = BuildConfig.APPLICATION_ID
+                channelId = BuildConfig.APPLICATION_ID,
+                key = SecuredConstants.GOOGLE_MAPS_WEB_API_KEY
             )
         }
 
@@ -35,6 +38,7 @@ object DependencyGraph {
 
         viewModel {
             MainViewModel(
+                networkThread = Schedulers.io(),
                 mainThread = AndroidSchedulers.mainThread(),
                 drivingDirectionsUseCase = get(),
                 walkingDirectionsUseCase = get()

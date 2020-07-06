@@ -6,8 +6,8 @@ import com.google.gson.GsonBuilder
 import de.p72b.geo.cache.PointHitCache
 import de.p72b.geo.google.DirectionsRoute
 import de.p72b.geo.google.ResolvedDirections
-import de.p72b.geo.http.ChannelIdInterceptor
 import de.p72b.geo.http.LatLngBoundsDeserializer
+import de.p72b.geo.http.ParamInterceptor
 import io.reactivex.Single
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -21,6 +21,7 @@ import java.util.ArrayList
 class GeoService(
     baseUrl: String,
     channelId: String,
+    key: String? = null,
     networkInterceptorList: List<Interceptor>? = ArrayList(),
     interceptorList: List<Interceptor>? = ArrayList(),
     converterFactoryList: List<Converter.Factory>? = ArrayList(),
@@ -42,10 +43,17 @@ class GeoService(
             // nothing to do here so far
         }
         client.addInterceptor(
-            ChannelIdInterceptor(
-                channelId
+            ParamInterceptor(
+                "channel", channelId
             )
         )
+        key?.let {
+            client.addInterceptor(
+                ParamInterceptor(
+                    "key", it
+                )
+            )
+        }
         networkInterceptorList?.let {
             for (item in it) {
                 client.addNetworkInterceptor(item)
