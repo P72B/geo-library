@@ -20,7 +20,7 @@ import java.util.ArrayList
 
 class GeoService(
     baseUrl: String,
-    channelId: String,
+    channel: String? = null,
     key: String? = null,
     networkInterceptorList: List<Interceptor>? = ArrayList(),
     interceptorList: List<Interceptor>? = ArrayList(),
@@ -42,11 +42,13 @@ class GeoService(
         } catch (e: Exception) {
             // nothing to do here so far
         }
-        client.addInterceptor(
-            ParamInterceptor(
-                "channel", channelId
+        channel?.let {
+            client.addInterceptor(
+                ParamInterceptor(
+                    "channel", channel
+                )
             )
-        )
+        }
         key?.let {
             client.addInterceptor(
                 ParamInterceptor(

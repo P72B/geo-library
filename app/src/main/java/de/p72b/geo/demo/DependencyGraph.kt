@@ -19,7 +19,7 @@ object DependencyGraph {
         single {
             GeoService(
                 baseUrl = GEO_SERVICE_BASE_URL,
-                channelId = BuildConfig.APPLICATION_ID,
+                channel = BuildConfig.APPLICATION_ID,
                 key = SecuredConstants.GOOGLE_MAPS_WEB_API_KEY
             )
         }
