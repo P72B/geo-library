@@ -1,7 +1,8 @@
 <resources>
     <string name="appName">geo-library</string>
-    <string name="origin">Origin</string>
-    <string name="destination">Destination</string>
+    <string name="origin">Origin (lat,lng)</string>
+    <string name="destination">Destination (lat,lng)</string>
     <string name="transportationModeWalking">Walking</string>
     <string name="transportationModeDriving">Driving</string>
+    <string name="cacheHitBoxSize">Cache hit box size [m]</string>
 </resources>

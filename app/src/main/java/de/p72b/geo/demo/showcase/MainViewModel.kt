@@ -18,28 +18,39 @@ class MainViewModel(
 ) : BaseViewModel(), LifecycleObserver {
 
     companion object {
+        private const val CACHE_BOX_HIT_SIZE_DEFAULT = 12
         private val originDefault = LatLng(52.532583, 13.382362)
         private val destinationDefault = LatLng(52.507710, 13.364320)
     }
 
     val origin = MutableLiveData<String>()
     val destination = MutableLiveData<String>()
+    val boxHitCacheSizeInMeters = MutableLiveData<String>()
 
     init {
         origin.postValue("${originDefault.latitude},${originDefault.longitude}")
         destination.postValue("${destinationDefault.latitude},${destinationDefault.longitude}")
+        boxHitCacheSizeInMeters.postValue(CACHE_BOX_HIT_SIZE_DEFAULT.toString())
     }
 
     fun onWalkingRouteClicked() {
         if (!isInputValid()) return
 
-        calculateWalkingRoute(parseLatLng(origin.value!!), parseLatLng(destination.value!!))
+        calculateWalkingRoute(
+            parseLatLng(origin.value!!),
+            parseLatLng(destination.value!!),
+            Integer.parseInt(boxHitCacheSizeInMeters.value!!)
+        )
     }
 
     fun onDrivingRouteClicked() {
         if (!isInputValid()) return
 
-        calculateDrivingRoute(parseLatLng(origin.value!!), parseLatLng(destination.value!!))
+        calculateDrivingRoute(
+            parseLatLng(origin.value!!),
+            parseLatLng(destination.value!!),
+            Integer.parseInt(boxHitCacheSizeInMeters.value!!)
+        )
     }
 
     private fun parseLatLng(value: String): LatLng {
@@ -50,11 +61,12 @@ class MainViewModel(
     private fun isInputValid(): Boolean {
         if (origin.value.isNullOrEmpty()) return false
         if (destination.value.isNullOrEmpty()) return false
+        if (boxHitCacheSizeInMeters.value == null) return false
         return true
     }
 
-    private fun calculateWalkingRoute(origin: LatLng, destination: LatLng) {
-        walkingDirectionsUseCase.invoke(origin, destination)
+    private fun calculateWalkingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
+        walkingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
@@ -70,8 +82,8 @@ class MainViewModel(
             ).autoDispose()
     }
 
-    private fun calculateDrivingRoute(origin: LatLng, destination: LatLng) {
-        drivingDirectionsUseCase.invoke(origin, destination)
+    private fun calculateDrivingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
+        drivingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {

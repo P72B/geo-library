@@ -3,7 +3,7 @@ package de.p72b.geo
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.gson.GsonBuilder
-import de.p72b.geo.cache.PointHitCache
+import de.p72b.geo.cache.BoxHitCache
 import de.p72b.geo.google.DirectionsRoute
 import de.p72b.geo.google.ResolvedDirections
 import de.p72b.geo.http.LatLngBoundsDeserializer
@@ -29,8 +29,8 @@ class GeoService(
     okHttpCacheSizeInMegaByte: Long = 10L * 1_024L * 1_024L // 10 MB
 ) {
 
-    private val directionsCache = PointHitCache(itemCacheSize)
-    private val locationsCache = PointHitCache(itemCacheSize)
+    private val directionsCache = BoxHitCache(itemCacheSize)
+    private val locationsCache = BoxHitCache(itemCacheSize)
     private val api: GeoServiceApi by lazy {
         val client = OkHttpClient.Builder()
         try {
@@ -87,16 +87,50 @@ class GeoService(
     }
 
 
-    fun pedestrianRoute(origin: LatLng, destination: LatLng): Single<DirectionsRoute> {
-        return routeBy(origin, destination, "walking")
+    fun pedestrianRoute(
+        origin: LatLng,
+        destination: LatLng,
+        allowedAccuracyOriginInMeters: Int = 0,
+        allowedAccuracyDestinationInMeters: Int = 0
+    ): Single<DirectionsRoute> {
+        return routeBy(
+            origin,
+            destination,
+            "walking",
+            allowedAccuracyOriginInMeters,
+            allowedAccuracyDestinationInMeters
+        )
     }
 
-    fun drivingRoute(origin: LatLng, destination: LatLng): Single<DirectionsRoute> {
-        return routeBy(origin, destination, "driving")
+    fun drivingRoute(
+        origin: LatLng,
+        destination: LatLng,
+        allowedAccuracyOriginInMeters: Int = 0,
+        allowedAccuracyDestinationInMeters: Int = 0
+    ): Single<DirectionsRoute> {
+        return routeBy(
+            origin,
+            destination,
+            "driving",
+            allowedAccuracyOriginInMeters,
+            allowedAccuracyDestinationInMeters
+        )
     }
 
-    private fun routeBy(origin: LatLng, destination: LatLng, mode: String): Single<DirectionsRoute> {
-        val cached = directionsCache.get(origin, destination, mode)
+    private fun routeBy(
+        origin: LatLng,
+        destination: LatLng,
+        mode: String,
+        allowedAccuracyOriginInMeters: Int = 0,
+        allowedAccuracyDestinationInMeters: Int = 0
+    ): Single<DirectionsRoute> {
+        val cached = directionsCache.get(
+            origin,
+            destination,
+            mode,
+            allowedAccuracyOriginInMeters,
+            allowedAccuracyDestinationInMeters
+        )
         return if (cached != null) {
             Single.just(cached)
         } else distanceCall(origin, destination, mode)

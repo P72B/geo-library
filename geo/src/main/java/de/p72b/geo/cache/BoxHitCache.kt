@@ -9,19 +9,20 @@ class BoxHitCache(maxSize: Int) : PointHitCache(maxSize) {
     fun get(
         origin: LatLng,
         destination: LatLng,
-        allowedAccuracyOrigin: Int,
-        allowedAccuracyDestination: Int
+        mode: String,
+        allowedAccuracyOriginInMeters: Int = 0,
+        allowedAccuracyDestinationInMeters: Int = 0
     ):
             DirectionsRoute? {
         val originBox =
             GeoUtils.getBoundsFromLocationWithinDistance(
                 origin,
-                allowedAccuracyOrigin
+                allowedAccuracyOriginInMeters
             )
         val destinationBox =
             GeoUtils.getBoundsFromLocationWithinDistance(
                 destination,
-                allowedAccuracyDestination
+                allowedAccuracyDestinationInMeters
             )
 
         for (cacheEntry in map.entries) {
@@ -37,7 +38,9 @@ class BoxHitCache(maxSize: Int) : PointHitCache(maxSize) {
                 )
 
             if (isOriginInside && isDestinationInside) {
-                return cacheEntry.value.cached as DirectionsRoute
+                if (cacheEntry.value.mode == mode) {
+                    return cacheEntry.value.cached as DirectionsRoute
+                }
             }
         }
         return null // nothing found
