@@ -147,49 +147,4 @@ object GeoUtils {
             )
         return LatLngBounds(bottomBounds.southwest, topBounds.northeast)
     }
-
-    /**
-     * Custom helper function to get a formatted address string from a google formatted address.
-     *
-     * @param formattedAddress String in google formatted address format.
-     * @return String holding custom formatted address.
-     */
-    fun getFormattedAddress(formattedAddress: String): String {
-        val split =
-            formattedAddress.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        return if (split.isEmpty()) {
-            formattedAddress
-        } else {
-            split[0]
-        }
-    }
-
-    /*
-    fun getBounds(polygon: GeoJsonPolygon): LatLngBounds? {
-        val polygonCoordinates = polygon.coordinates
-        var minLat = 0.0
-        var minLng = 0.0
-        var maxLat = 0.0
-        var maxLng = 0.0
-        for (points in polygonCoordinates) {
-            for (point in points) {
-                if (point.longitude > maxLng) {
-                    maxLng = point.longitude
-                }
-                if (point.latitude > maxLat) {
-                    maxLat = point.latitude
-                }
-                if (point.longitude < minLng) {
-                    minLng = point.longitude
-                }
-                if (point.latitude < minLng) {
-                    minLat = point.latitude
-                }
-            }
-        }
-        return if (minLat == 0.0 && minLng == 0.0 && maxLat == 0.0 && maxLng == 0.0) {
-            null
-        } else LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng))
-    }
-    */
 }

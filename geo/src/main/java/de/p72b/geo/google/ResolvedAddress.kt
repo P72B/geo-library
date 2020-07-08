@@ -2,7 +2,6 @@ package de.p72b.geo.google
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
-import de.p72b.geo.util.GeoUtils
 
 data class ResolvedAddress(
     @SerializedName("results") val list: List<Address>? = null
@@ -21,7 +20,7 @@ data class Address(
 ) {
 
     val getFormattedAddress: String
-        get() = GeoUtils.getFormattedAddress(formattedAddress!!)
+        get() = FormatHelper.getFormattedAddress(formattedAddress!!)
     val getFullAddress: String?
         get() = formattedAddress
     val latLng: LatLng

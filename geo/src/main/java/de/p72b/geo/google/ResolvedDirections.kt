@@ -2,7 +2,6 @@ package de.p72b.geo.google
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
-import de.p72b.geo.util.GeoUtils
 import de.p72b.geo.util.PolylineEncoding
 
 data class ResolvedDirections(
@@ -44,7 +43,7 @@ data class DirectionsRoute(
 
             return when (lastLeg.endAddress) {
                 null -> ""
-                else -> GeoUtils.getFormattedAddress(lastLeg.endAddress!!)
+                else -> FormatHelper.getFormattedAddress(lastLeg.endAddress!!)
             }
         }
 

@@ -8,6 +8,7 @@ import de.p72b.geo.demo.usecase.WalkingDirectionsUseCase
 import de.p72b.geo.demo.util.BaseViewModel
 import de.p72b.geo.demo.util.ConverterHelper
 import de.p72b.geo.google.DirectionsRoute
+import de.p72b.geo.util.UnitLocale
 import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.subscribeBy
 
@@ -20,13 +21,14 @@ class MainViewModel(
 
     companion object {
         private const val CACHE_BOX_HIT_SIZE_DEFAULT = 12
-        val originDefault = LatLng(52.526136, 13.416046)
-        val destinationDefault = LatLng(52.52901, 13.412728)
+        val originDefault = LatLng(52.5329704, 13.3832851)
+        val destinationDefault = LatLng(52.5076062, 13.3646353)
     }
 
     val origin = MutableLiveData<String>()
     val destination = MutableLiveData<String>()
     val boxHitCacheSizeInMeters = MutableLiveData<String>()
+    val tripSummary = MutableLiveData<String>()
     val route = MutableLiveData<List<LatLng>>()
 
     init {
@@ -112,6 +114,17 @@ class MainViewModel(
         result?.let { directionsRoute ->
             directionsRoute.polyLine?.let {
                 route.postValue(it.decodePath())
+            }
+            val distance = directionsRoute.getDistance?.inMeters ?: 0L
+            val duration = directionsRoute.getDuration?.inSeconds ?: 0L
+            if (distance > 0L && duration > 0L) {
+                tripSummary.postValue(
+                    "${duration / 60} Min. (${UnitLocale.default.fromMeters(
+                        distance
+                    )})"
+                )
+            } else {
+                tripSummary.postValue("")
             }
         }
     }
