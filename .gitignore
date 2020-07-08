@@ -85,3 +85,6 @@ lint/tmp/
 # lint/reports/
 
 geo/src/main/java/de/p72b/geo/util/SecuredConstants.kt
+app/geoservice-debug-key.keystore
+app/geoservice-release-key.keystore
+app/signing.properties

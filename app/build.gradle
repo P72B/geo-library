@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+Properties props = new Properties()
+def propFile = file('signing.properties')
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.0"
@@ -21,11 +24,58 @@ android {
         dataBinding true
     }
 
+    def googleMapsApiKey = ""
+    if (propFile.canRead() && props != null){
+        def KEY_GOOGLE_MAPS_API_KEY = "GOOGLE_MAPS_API_KEY"
+
+        props.load(new FileInputStream(propFile))
+        if (props.containsKey(KEY_GOOGLE_MAPS_API_KEY)) {
+            googleMapsApiKey = props[KEY_GOOGLE_MAPS_API_KEY]
+        }
+    }
+
+    signingConfigs {
+        release
+        debug
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            resValue "string", "google_maps_key", googleMapsApiKey
+        }
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue "string", "google_maps_key", googleMapsApiKey
         }
+    }
+}
+
+if (propFile.canRead() && props != null){
+    def KEY_STORE_FILE_DEBUG = "STORE_FILE_DEBUG"
+    def KEY_STORE_PASSWORD_DEBUG = "STORE_PASSWORD_DEBUG"
+    def KEY_KEY_ALIAS_DEBUG = "KEY_ALIAS_DEBUG"
+    def KEY_KEY_PASSWORD_DEBUG = "KEY_PASSWORD_DEBUG"
+    def KEY_STORE_FILE_RELEASE = "STORE_FILE_RELEASE"
+    def KEY_STORE_PASSWORD_RELEASE = "STORE_PASSWORD_RELEASE"
+    def KEY_KEY_ALIAS_RELEASE = "KEY_ALIAS_RELEASE"
+    def KEY_KEY_PASSWORD_RELEASE = "KEY_PASSWORD_RELEASE"
+
+    if (props.containsKey(KEY_STORE_FILE_DEBUG) && props.containsKey(KEY_STORE_PASSWORD_DEBUG)
+            && props.containsKey(KEY_KEY_ALIAS_DEBUG) && props.containsKey(KEY_KEY_PASSWORD_DEBUG)) {
+        android.signingConfigs.debug.storeFile = file(props[KEY_STORE_FILE_DEBUG])
+        android.signingConfigs.debug.storePassword = props[KEY_STORE_PASSWORD_DEBUG]
+        android.signingConfigs.debug.keyAlias = props[KEY_KEY_ALIAS_DEBUG]
+        android.signingConfigs.debug.keyPassword = props[KEY_KEY_PASSWORD_DEBUG]
+    }
+    if (props.containsKey(KEY_STORE_FILE_RELEASE) && props.containsKey(KEY_STORE_PASSWORD_RELEASE)
+            && props.containsKey(KEY_KEY_ALIAS_RELEASE) && props.containsKey(KEY_KEY_PASSWORD_RELEASE)) {
+        android.signingConfigs.release.storeFile = file(props[KEY_STORE_FILE_RELEASE])
+        android.signingConfigs.release.storePassword = props[KEY_STORE_PASSWORD_RELEASE]
+        android.signingConfigs.release.keyAlias = props[KEY_KEY_ALIAS_RELEASE]
+        android.signingConfigs.release.keyPassword = props[KEY_KEY_PASSWORD_RELEASE]
     }
 }
 
