@@ -4,5 +4,5 @@
     <string name="destination">Destination (lat,lng)</string>
     <string name="transportationModeWalking">Walking</string>
     <string name="transportationModeDriving">Driving</string>
-    <string name="cacheHitBoxSize">Cache hit box size [m]</string>
+    <string name="cacheHitBoxSize">Cache box [m]</string>
 </resources>

@@ -13,7 +13,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
         tools:context=".showcase.MainActivity">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -22,12 +21,14 @@
             android:layout_height="wrap_content"
             android:hint="@string/origin"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:afterTextChanged="@{(e) -> viewmodel.originChanged(e.toString())}"
                 android:singleLine="true"
                 android:text="@{viewmodel.origin}" />
 
@@ -35,16 +36,18 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_destination"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/destination"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_origin">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:afterTextChanged="@{(e) -> viewmodel.destinationChanged(e.toString())}"
                 android:singleLine="true"
                 android:text="@{viewmodel.destination}" />
 
@@ -56,12 +59,13 @@
             android:layout_height="wrap_content"
             android:hint="@string/cacheHitBoxSize"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_destination">
+            app:layout_constraintStart_toEndOf="@+id/tv_destination"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:afterTextChanged="@{(e) -> viewmodel.cacheHitBoxSizeChanged(e.toString())}"
                 android:ems="10"
                 android:inputType="number"
                 android:singleLine="true"
@@ -75,7 +79,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_cache_box_hit_size"
+            app:layout_constraintTop_toBottomOf="@+id/tv_destination"
             app:singleLine="true"
             app:singleSelection="true">
 

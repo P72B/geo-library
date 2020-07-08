@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import de.p72b.geo.demo.usecase.DrivingDirectionsUseCase
 import de.p72b.geo.demo.usecase.WalkingDirectionsUseCase
 import de.p72b.geo.demo.util.BaseViewModel
+import de.p72b.geo.demo.util.ConverterHelper
 import de.p72b.geo.google.DirectionsRoute
 import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.subscribeBy
@@ -19,8 +20,8 @@ class MainViewModel(
 
     companion object {
         private const val CACHE_BOX_HIT_SIZE_DEFAULT = 12
-        private val originDefault = LatLng(52.532583, 13.382362)
-        private val destinationDefault = LatLng(52.507710, 13.364320)
+        val originDefault = LatLng(52.526136, 13.416046)
+        val destinationDefault = LatLng(52.52901, 13.412728)
     }
 
     val origin = MutableLiveData<String>()
@@ -28,8 +29,8 @@ class MainViewModel(
     val boxHitCacheSizeInMeters = MutableLiveData<String>()
 
     init {
-        origin.postValue("${originDefault.latitude},${originDefault.longitude}")
-        destination.postValue("${destinationDefault.latitude},${destinationDefault.longitude}")
+        origin.postValue(ConverterHelper.latLngToString(originDefault))
+        destination.postValue(ConverterHelper.latLngToString(destinationDefault))
         boxHitCacheSizeInMeters.postValue(CACHE_BOX_HIT_SIZE_DEFAULT.toString())
     }
 
@@ -37,8 +38,8 @@ class MainViewModel(
         if (!isInputValid()) return
 
         calculateWalkingRoute(
-            parseLatLng(origin.value!!),
-            parseLatLng(destination.value!!),
+            ConverterHelper.stringToLatLng(origin.value!!),
+            ConverterHelper.stringToLatLng(destination.value!!),
             Integer.parseInt(boxHitCacheSizeInMeters.value!!)
         )
     }
@@ -47,15 +48,22 @@ class MainViewModel(
         if (!isInputValid()) return
 
         calculateDrivingRoute(
-            parseLatLng(origin.value!!),
-            parseLatLng(destination.value!!),
+            ConverterHelper.stringToLatLng(origin.value!!),
+            ConverterHelper.stringToLatLng(destination.value!!),
             Integer.parseInt(boxHitCacheSizeInMeters.value!!)
         )
     }
 
-    private fun parseLatLng(value: String): LatLng {
-        val components = value.split(",")
-        return LatLng(components[0].toDouble(), components[1].toDouble())
+    fun cacheHitBoxSizeChanged(value: String) {
+        boxHitCacheSizeInMeters.postValue(value)
+    }
+
+    fun originChanged(value: String) {
+        origin.postValue(value)
+    }
+
+    fun destinationChanged(value: String) {
+        destination.postValue(value)
     }
 
     private fun isInputValid(): Boolean {
