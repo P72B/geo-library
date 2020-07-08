@@ -12,7 +12,8 @@ import org.koin.dsl.module
 
 object DependencyGraph {
 
-    private const val GEO_SERVICE_BASE_URL = "https://maps.googleapis.com/maps/api/"
+    private const val GOOGLE_API_BASE_URL = "https://maps.googleapis.com/maps/api/"
+    private const val GEO_SERVICE_BASE_URL = "http://192.168.1.26:5000/geo/"
 
     private val appModule = module {
 
