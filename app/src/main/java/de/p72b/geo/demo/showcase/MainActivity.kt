@@ -8,10 +8,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import de.p72b.geo.demo.BR
 import de.p72b.geo.demo.R
 import de.p72b.geo.demo.databinding.ActivityMainBinding
@@ -30,6 +27,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var map: GoogleMap
     private lateinit var originMarker: Marker
     private lateinit var destinationMarker: Marker
+    private lateinit var route: Polyline
     private var shouldAutoZoom = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,38 +45,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.setOnMarkerDragListener(this)
-        viewModel.origin.observe(this, Observer { input ->
-            ConverterHelper.stringToLatLng(input).let { latLng ->
-                if (this::originMarker.isInitialized) {
-                    if (isSameLoctaion(originMarker.position, latLng)) return@Observer
-                    originMarker.position = latLng
-                    zoomToBounds()
-                    return@Observer
-                }
-                originMarker = map.addMarker(
-                    MarkerOptions()
-                        .position(latLng)
-                        .draggable(true)
-                )
-                originMarker.tag = TAG_ORIGIN_MARKER
-            }
-        })
-        viewModel.destination.observe(this, Observer { input ->
-            ConverterHelper.stringToLatLng(input).let { latLng ->
-                if (this::destinationMarker.isInitialized) {
-                    if (isSameLoctaion(destinationMarker.position, latLng)) return@Observer
-                    destinationMarker.position = latLng
-                    zoomToBounds()
-                    return@Observer
-                }
-                destinationMarker = map.addMarker(
-                    MarkerOptions()
-                        .position(latLng)
-                        .draggable(true)
-                )
-                destinationMarker.tag = TAG_DESTINATION_MARKER
-            }
-        })
+        observeOrigin()
+        observeDestination()
+        observeRoute()
         zoomToBounds()
     }
 
@@ -121,7 +90,59 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    private fun isSameLoctaion(latLng1: LatLng, latLng2: LatLng): Boolean {
+    private fun isSameLocation(latLng1: LatLng, latLng2: LatLng): Boolean {
         return latLng1.latitude == latLng2.latitude && latLng1.longitude == latLng2.longitude
+    }
+
+    private fun observeOrigin() {
+        viewModel.origin.observe(this, Observer { input ->
+            ConverterHelper.stringToLatLng(input).let { latLng ->
+                if (this::originMarker.isInitialized) {
+                    if (isSameLocation(originMarker.position, latLng)) return@Observer
+                    originMarker.position = latLng
+                    zoomToBounds()
+                    return@Observer
+                }
+                originMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .draggable(true)
+                )
+                originMarker.tag = TAG_ORIGIN_MARKER
+            }
+        })
+    }
+
+    private fun observeDestination() {
+        viewModel.destination.observe(this, Observer { input ->
+            ConverterHelper.stringToLatLng(input).let { latLng ->
+                if (this::destinationMarker.isInitialized) {
+                    if (isSameLocation(destinationMarker.position, latLng)) return@Observer
+                    destinationMarker.position = latLng
+                    zoomToBounds()
+                    return@Observer
+                }
+                destinationMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .draggable(true)
+                )
+                destinationMarker.tag = TAG_DESTINATION_MARKER
+            }
+        })
+    }
+
+    private fun observeRoute() {
+        viewModel.route.observe(this, Observer { list ->
+            if (this::route.isInitialized) {
+                route.points = list
+                return@Observer
+            }
+            val polylineOptions = PolylineOptions()
+            for (item in list) {
+                polylineOptions.add(item)
+            }
+            route = map.addPolyline(polylineOptions)
+        })
     }
 }

@@ -27,6 +27,7 @@ class MainViewModel(
     val origin = MutableLiveData<String>()
     val destination = MutableLiveData<String>()
     val boxHitCacheSizeInMeters = MutableLiveData<String>()
+    val route = MutableLiveData<List<LatLng>>()
 
     init {
         origin.postValue(ConverterHelper.latLngToString(originDefault))
@@ -107,7 +108,11 @@ class MainViewModel(
             ).autoDispose()
     }
 
-    private fun handleDirectionsResult(directionsRoute: DirectionsRoute?) {
-        System.out.println("handleDirectionsResult")
+    private fun handleDirectionsResult(result: DirectionsRoute?) {
+        result?.let { directionsRoute ->
+            directionsRoute.polyLine?.let {
+                route.postValue(it.decodePath())
+            }
+        }
     }
 }
