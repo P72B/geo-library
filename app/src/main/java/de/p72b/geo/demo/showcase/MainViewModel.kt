@@ -3,10 +3,7 @@ package de.p72b.geo.demo.showcase
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.model.LatLng
-import de.p72b.geo.demo.usecase.OsrmDrivingDirectionsUseCase
-import de.p72b.geo.demo.usecase.GoogleDrivingDirectionsUseCase
-import de.p72b.geo.demo.usecase.GoogleWalkingDirectionsUseCase
-import de.p72b.geo.demo.usecase.OsrmWalkingDirectionsUseCase
+import de.p72b.geo.demo.usecase.*
 import de.p72b.geo.demo.util.BaseViewModel
 import de.p72b.geo.demo.util.ConverterHelper
 import de.p72b.geo.google.DirectionsRoute
@@ -86,39 +83,58 @@ class MainViewModel(
 
     private fun calculateWalkingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
         progressActive.postValue(true)
-        osrmWalkingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
-            .subscribeOn(networkThread)
-            .observeOn(mainThread)
-            .doFinally {
-                doOnFinally()
-            }
-            .subscribeBy(
-                onError = {
-                    System.out.println("ERROR $it")
-                },
-                onSuccess = {
-                    handleDirectionsResult(OSRM_SERVICE_ID, it, osrmTripSummary, osrmRoute)
-                }
-            ).autoDispose()
-        googleWalkingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
-            .subscribeOn(networkThread)
-            .observeOn(mainThread)
-            .doFinally {
-                doOnFinally()
-            }
-            .subscribeBy(
-                onError = {
-                    System.out.println("ERROR $it")
-                },
-                onSuccess = {
-                    handleDirectionsResult(GOOGLE_SERVICE_ID, it, googleTripSummary, googleRoute)
-                }
-            ).autoDispose()
+        callDirections(
+            osrmWalkingDirectionsUseCase,
+            origin,
+            destination,
+            cacheHitSize,
+            OSRM_SERVICE_ID,
+            osrmTripSummary,
+            osrmRoute
+        )
+        callDirections(
+            googleWalkingDirectionsUseCase,
+            origin,
+            destination,
+            cacheHitSize,
+            GOOGLE_SERVICE_ID,
+            googleTripSummary,
+            googleRoute
+        )
     }
 
     private fun calculateDrivingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
         progressActive.postValue(true)
-        osrmDrivingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
+        callDirections(
+            osrmDrivingDirectionsUseCase,
+            origin,
+            destination,
+            cacheHitSize,
+            OSRM_SERVICE_ID,
+            osrmTripSummary,
+            osrmRoute
+        )
+        callDirections(
+            googleDrivingDirectionsUseCase,
+            origin,
+            destination,
+            cacheHitSize,
+            GOOGLE_SERVICE_ID,
+            googleTripSummary,
+            googleRoute
+        )
+    }
+
+    private fun callDirections(
+        useCase: DirectionsUseCase,
+        origin: LatLng,
+        destination: LatLng,
+        cacheHitSize: Int,
+        serviceResultName: String,
+        summary: MutableLiveData<String>,
+        route: MutableLiveData<Pair<String, List<LatLng>>>
+    ) {
+        useCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
@@ -129,21 +145,7 @@ class MainViewModel(
                     System.out.println("ERROR $it")
                 },
                 onSuccess = {
-                    handleDirectionsResult(OSRM_SERVICE_ID, it, osrmTripSummary, osrmRoute)
-                }
-            ).autoDispose()
-        googleDrivingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
-            .subscribeOn(networkThread)
-            .observeOn(mainThread)
-            .doFinally {
-                doOnFinally()
-            }
-            .subscribeBy(
-                onError = {
-                    System.out.println("ERROR $it")
-                },
-                onSuccess = {
-                    handleDirectionsResult(GOOGLE_SERVICE_ID, it, googleTripSummary, googleRoute)
+                    handleDirectionsResult(serviceResultName, it, summary, route)
                 }
             ).autoDispose()
     }

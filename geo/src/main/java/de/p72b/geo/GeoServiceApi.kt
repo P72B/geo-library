@@ -15,7 +15,6 @@ interface GeoServiceApi {
         const val ENDPOINT_GEO_DIRECTIONS = "directions/json"
         const val ENDPOINT_GEO_GEOCODE = "geocode/json"
         const val ENDPOINT_GEO_AUTOCOMPLETE = "autocomplete"
-        const val COMPONENT_PREFIX_COUNTRY = "country:"
     }
 
     @GET(ENDPOINT_GEO_DIRECTIONS)
