@@ -1,9 +1,12 @@
 package de.p72b.geo.demo
 
-import de.p72b.geo.GeoService
 import de.p72b.geo.demo.showcase.MainViewModel
-import de.p72b.geo.demo.usecase.DrivingDirectionsUseCase
-import de.p72b.geo.demo.usecase.WalkingDirectionsUseCase
+import de.p72b.geo.demo.usecase.OsrmDrivingDirectionsUseCase
+import de.p72b.geo.demo.usecase.GoogleDrivingDirectionsUseCase
+import de.p72b.geo.demo.usecase.GoogleWalkingDirectionsUseCase
+import de.p72b.geo.demo.usecase.OsrmWalkingDirectionsUseCase
+import de.p72b.geo.demo.util.GoogleGeoService
+import de.p72b.geo.demo.util.OsrmGeoService
 import de.p72b.geo.util.SecuredConstants
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -18,21 +21,40 @@ object DependencyGraph {
     private val appModule = module {
 
         single {
-            GeoService(
+            OsrmGeoService(
                 baseUrl = GEO_SERVICE_BASE_URL,
+                channel = BuildConfig.APPLICATION_ID
+            )
+        }
+
+        single {
+            GoogleGeoService(
+                baseUrl = GOOGLE_API_BASE_URL,
                 channel = BuildConfig.APPLICATION_ID,
                 key = SecuredConstants.GOOGLE_MAPS_WEB_API_KEY
             )
         }
 
         factory {
-            DrivingDirectionsUseCase(
+            OsrmDrivingDirectionsUseCase(
                 geoService = get()
             )
         }
 
         factory {
-            WalkingDirectionsUseCase(
+            OsrmWalkingDirectionsUseCase(
+                geoService = get()
+            )
+        }
+
+        factory {
+            GoogleDrivingDirectionsUseCase(
+                geoService = get()
+            )
+        }
+
+        factory {
+            GoogleWalkingDirectionsUseCase(
                 geoService = get()
             )
         }
@@ -41,8 +63,10 @@ object DependencyGraph {
             MainViewModel(
                 networkThread = Schedulers.io(),
                 mainThread = AndroidSchedulers.mainThread(),
-                drivingDirectionsUseCase = get(),
-                walkingDirectionsUseCase = get()
+                osrmDrivingDirectionsUseCase = get(),
+                osrmWalkingDirectionsUseCase = get(),
+                googleDrivingDirectionsUseCase = get(),
+                googleWalkingDirectionsUseCase = get()
             )
         }
     }

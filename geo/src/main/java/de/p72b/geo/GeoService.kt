@@ -18,7 +18,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.ArrayList
 
-class GeoService(
+open class GeoService(
     baseUrl: String,
     channel: String? = null,
     key: String? = null,

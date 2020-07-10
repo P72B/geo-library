@@ -2,10 +2,18 @@ package de.p72b.geo.demo.usecase
 
 import com.google.android.gms.maps.model.LatLng
 import de.p72b.geo.GeoService
+import de.p72b.geo.demo.util.GoogleGeoService
+import de.p72b.geo.demo.util.OsrmGeoService
 import de.p72b.geo.google.DirectionsRoute
 import io.reactivex.Single
 
-class DrivingDirectionsUseCase(private val geoService: GeoService) {
+class OsrmDrivingDirectionsUseCase(geoService: OsrmGeoService) :
+    DrivingDirectionsUseCase(geoService)
+
+class GoogleDrivingDirectionsUseCase(geoService: GoogleGeoService) :
+    DrivingDirectionsUseCase(geoService)
+
+abstract class DrivingDirectionsUseCase(private val geoService: GeoService) {
     operator fun invoke(
         origin: LatLng,
         destination: LatLng,

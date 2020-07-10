@@ -119,17 +119,33 @@
             tools:context=".MainActivity" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/lable_osrm_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="@{viewmodel.tripSummary}"
+            android:text="@{viewmodel.osrmTripSummary}"
+            android:textColor="@color/osrm"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/transportation_mode"
+            app:layout_constraintTop_toTopOf="@+id/transportation_mode"
+            tools:text="27 Min. (2.3 km)" />
+
+        <TextView
+            android:id="@+id/lable_google_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@{viewmodel.googleTripSummary}"
+            android:textColor="@color/google"
             app:layout_constraintBottom_toBottomOf="@+id/transportation_mode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/transportation_mode"
-            app:layout_constraintTop_toTopOf="@+id/transportation_mode" />
+            app:layout_constraintTop_toBottomOf="@+id/lable_osrm_summary"
+            tools:text="28 Min. (2.2 km)" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

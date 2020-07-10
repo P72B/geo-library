@@ -2,6 +2,7 @@ package de.p72b.geo.demo.showcase
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -13,7 +14,9 @@ import de.p72b.geo.demo.BR
 import de.p72b.geo.demo.R
 import de.p72b.geo.demo.databinding.ActivityMainBinding
 import de.p72b.geo.demo.util.ConverterHelper
+import de.p72b.geo.util.GeoUtils
 import org.koin.androidx.viewmodel.ext.android.getViewModel
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
 
@@ -28,6 +31,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var originMarker: Marker
     private lateinit var destinationMarker: Marker
     private lateinit var route: Polyline
+    private lateinit var googleRoute: Polyline
+    private lateinit var originBoxPolygon: Polygon
+    private lateinit var destinationBoxPolygon: Polygon
     private var shouldAutoZoom = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +54,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         observeOrigin()
         observeDestination()
         observeRoute()
+        observeGoogleRoute()
+        observeCacheBoxSize()
         zoomToBounds()
     }
 
@@ -133,16 +141,81 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     private fun observeRoute() {
-        viewModel.route.observe(this, Observer { list ->
+        viewModel.osrmRoute.observe(this, Observer { list ->
             if (this::route.isInitialized) {
-                route.points = list
+                route.points = list.second
+                tryToDrawCacheBox()
                 return@Observer
             }
-            val polylineOptions = PolylineOptions()
-            for (item in list) {
+            val polylineOptions =
+                PolylineOptions().color(ContextCompat.getColor(this, R.color.osrm))
+            for (item in list.second) {
                 polylineOptions.add(item)
             }
             route = map.addPolyline(polylineOptions)
+            tryToDrawCacheBox()
         })
+    }
+
+    private fun observeGoogleRoute() {
+        viewModel.googleRoute.observe(this, Observer { list ->
+            if (this::googleRoute.isInitialized) {
+                googleRoute.points = list.second
+                tryToDrawCacheBox()
+                return@Observer
+            }
+            val polylineOptions =
+                PolylineOptions().color(ContextCompat.getColor(this, R.color.google))
+            for (item in list.second) {
+                polylineOptions.add(item)
+            }
+            googleRoute = map.addPolyline(polylineOptions)
+            tryToDrawCacheBox()
+        })
+    }
+
+    private fun observeCacheBoxSize() {
+        viewModel.boxHitCacheSizeInMeters.observe(this, Observer { value ->
+            drawCacheBox(value.toInt())
+        })
+    }
+
+    private fun tryToDrawCacheBox() {
+        viewModel.boxHitCacheSizeInMeters.value?.toInt()?.let {
+            drawCacheBox(it)
+        }
+    }
+
+    private fun drawCacheBox(size: Int) {
+        if ((!(this::originMarker.isInitialized) && !(this::destinationMarker.isInitialized)) ||
+            size == 0
+        ) {
+            return
+        }
+        if (this::destinationBoxPolygon.isInitialized) {
+            destinationBoxPolygon.remove()
+        }
+        if (this::originBoxPolygon.isInitialized) {
+            originBoxPolygon.remove()
+        }
+        val originBox =
+            GeoUtils.getBoundsFromLocationWithinDistance(originMarker.position, size)
+        val destinationBox =
+            GeoUtils.getBoundsFromLocationWithinDistance(destinationMarker.position, size)
+        destinationBoxPolygon = map.addPolygon(polygonOptionsFromLatLngBounds(destinationBox))
+        originBoxPolygon = map.addPolygon(polygonOptionsFromLatLngBounds(originBox))
+    }
+
+    private fun polygonOptionsFromLatLngBounds(latLngBounds: LatLngBounds): PolygonOptions {
+        val polygonOptions = PolygonOptions()
+        val northwest = LatLng(latLngBounds.southwest.latitude, latLngBounds.northeast.longitude)
+        val southeast = LatLng(latLngBounds.northeast.latitude, latLngBounds.southwest.longitude)
+
+        polygonOptions.add(latLngBounds.northeast, northwest)
+        polygonOptions.add(northwest, latLngBounds.southwest)
+        polygonOptions.add(latLngBounds.southwest, southeast)
+        polygonOptions.add(southeast, latLngBounds.northeast)
+
+        return polygonOptions
     }
 }

@@ -78,7 +78,7 @@ data class DirectionsLeg(
 )
 
 data class EncodedPolyline(
-    @SerializedName("points") private val points: String
+    @SerializedName("points") val points: String
 ) {
 
     fun decodePath(): List<LatLng> {
