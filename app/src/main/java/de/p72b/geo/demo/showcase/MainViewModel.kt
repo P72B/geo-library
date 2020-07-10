@@ -32,18 +32,18 @@ class MainViewModel(
     }
 
     val origin = MutableLiveData<String>()
+        .apply { postValue(ConverterHelper.latLngToString(originDefault)) }
     val destination = MutableLiveData<String>()
+        .apply { postValue(ConverterHelper.latLngToString(destinationDefault)) }
     val boxHitCacheSizeInMeters = MutableLiveData<String>()
+        .apply { postValue(CACHE_BOX_HIT_SIZE_DEFAULT.toString()) }
     val osrmTripSummary = MutableLiveData<String>()
     val googleTripSummary = MutableLiveData<String>()
     val osrmRoute = MutableLiveData<Pair<String, List<LatLng>>>()
     val googleRoute = MutableLiveData<Pair<String, List<LatLng>>>()
-
-    init {
-        origin.postValue(ConverterHelper.latLngToString(originDefault))
-        destination.postValue(ConverterHelper.latLngToString(destinationDefault))
-        boxHitCacheSizeInMeters.postValue(CACHE_BOX_HIT_SIZE_DEFAULT.toString())
-    }
+    val progressActive = MutableLiveData<Boolean>()
+        .apply { postValue(false) }
+    private var onFinallyCount = 0
 
     fun onWalkingRouteClicked() {
         if (!isInputValid()) return
@@ -85,11 +85,12 @@ class MainViewModel(
     }
 
     private fun calculateWalkingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
+        progressActive.postValue(true)
         osrmWalkingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
-                System.out.println("doFinally")
+                doOnFinally()
             }
             .subscribeBy(
                 onError = {
@@ -103,7 +104,7 @@ class MainViewModel(
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
-                System.out.println("doFinally")
+                doOnFinally()
             }
             .subscribeBy(
                 onError = {
@@ -116,11 +117,12 @@ class MainViewModel(
     }
 
     private fun calculateDrivingRoute(origin: LatLng, destination: LatLng, cacheHitSize: Int) {
+        progressActive.postValue(true)
         osrmDrivingDirectionsUseCase.invoke(origin, destination, cacheHitSize, cacheHitSize)
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
-                System.out.println("doFinally")
+                doOnFinally()
             }
             .subscribeBy(
                 onError = {
@@ -134,7 +136,7 @@ class MainViewModel(
             .subscribeOn(networkThread)
             .observeOn(mainThread)
             .doFinally {
-                System.out.println("doFinally")
+                doOnFinally()
             }
             .subscribeBy(
                 onError = {
@@ -144,6 +146,13 @@ class MainViewModel(
                     handleDirectionsResult(GOOGLE_SERVICE_ID, it, googleTripSummary, googleRoute)
                 }
             ).autoDispose()
+    }
+
+    private fun doOnFinally() {
+        onFinallyCount++
+        if (onFinallyCount < 2) return
+        onFinallyCount = 0
+        progressActive.postValue(false)
     }
 
     private fun handleDirectionsResult(

@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewmodel"
             type="de.p72b.geo.demo.showcase.MainViewModel" />
@@ -14,6 +16,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".showcase.MainActivity">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:indeterminate="true"
+            android:visibility="@{viewmodel.progressActive? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/map" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tv_origin"
