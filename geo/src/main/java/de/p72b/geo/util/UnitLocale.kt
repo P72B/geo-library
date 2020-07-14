@@ -27,7 +27,7 @@ abstract class UnitLocale {
                 val feet: Double = (meters * FEET_IN_METER)
                 return when {
                     feet < FEET_IN_HUNDRED_YARDS -> format("%.0f $FEET_UNIT", feet)
-                    feet < FEET_IN_MILE - FEET_THRESHOLD -> format("%.1f $YARD_UNIT", feet / FEET_IN_YARD)
+                    feet < FEET_IN_MILE - FEET_THRESHOLD -> format("%.0f $YARD_UNIT", feet / FEET_IN_YARD)
                     feet > FEET_IN_MILE - FEET_THRESHOLD && feet < FEET_IN_MILE + FEET_THRESHOLD -> "1 mile"
                     else -> format("%.1f $MILE_UNIT", feet / FEET_IN_MILE)
                 }
