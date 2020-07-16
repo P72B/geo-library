@@ -1,5 +1,6 @@
 package de.p72b.geo.util
 
+import androidx.annotation.Keep
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
@@ -9,6 +10,7 @@ import java.util.*
  * See {@url https://developers.google.com/maps/documentation/utilities/polylinealgorithm} for
  * detailed description of this format.
  */
+@Keep
 object PolylineEncoding {
     /**
      * Decodes an encoded path string into a sequence of LatLngs.

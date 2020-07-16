@@ -1,13 +1,16 @@
 package de.p72b.geo.google
 
+import androidx.annotation.Keep
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import de.p72b.geo.util.PolylineEncoding
 
+@Keep
 data class ResolvedDirections(
     @SerializedName("routes") var list: Array<DirectionsRoute>? = null
 )
 
+@Keep
 data class DirectionsRoute(
     @SerializedName("legs") var list: Array<DirectionsLeg>? = null,
     @SerializedName("overview_polyline") var polyLine: EncodedPolyline? = null
@@ -63,20 +66,24 @@ data class DirectionsRoute(
     }
 }
 
+@Keep
 data class Distance(
     @SerializedName("value") var inMeters: Long = 0
 )
 
+@Keep
 data class Duration(
     @SerializedName("value") var inSeconds: Long = 0
 )
 
+@Keep
 data class DirectionsLeg(
     @SerializedName("distance") var distance: Distance? = null,
     @SerializedName("duration") var duration: Duration? = null,
     @SerializedName("end_address") var endAddress: String? = null
 )
 
+@Keep
 data class EncodedPolyline(
     @SerializedName("points") val points: String
 ) {
