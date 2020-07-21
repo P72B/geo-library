@@ -7,7 +7,7 @@ import de.p72b.geo.demo.usecase.GoogleWalkingDirectionsUseCase
 import de.p72b.geo.demo.usecase.OsrmWalkingDirectionsUseCase
 import de.p72b.geo.demo.util.GoogleGeoService
 import de.p72b.geo.demo.util.OsrmGeoService
-import de.p72b.geo.util.SecuredConstants
+import de.p72b.geo.demo.util.SecuredConstants
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.dsl.viewModel
